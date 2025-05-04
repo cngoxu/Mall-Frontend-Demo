@@ -1,0 +1,72 @@
+<script>
+    $(document).ready(function() {
+        // 初始化组件
+        const rechargeModal = M.Modal.init($('#recharge-modal'));
+
+        // 自定义金额选择
+        $('input[name="recharge-amount"]').change(function () {
+            if ($(this).val() === 'custom') {
+                $('#custom-amount-container').show();
+                $('#custom-amount').focus();
+            } else {
+                $('#custom-amount-container').hide();
+            }
+        });
+
+        // 确认充值
+        $('#confirm-recharge').click(function () {
+            let amount = $('input[name="recharge-amount"]:checked').val();
+            const method = $('input[name="recharge-method"]:checked').val();
+
+            if (amount === 'custom') {
+                amount = $('#custom-amount').val();
+                if (!amount || amount <= 0) {
+                    M.toast({ html: '请输入有效的充值金额' });
+                    return;
+                }
+            }
+            
+            customAjax({
+                path: '/balance/recharge',
+                method: 'POST',
+                data: {
+                    amount: amount,
+                },
+                before: function () {
+                    $('#confirm-recharge').addClass('disabled').html(`
+                        <div class="preloader-wrapper small active">
+                            <div class="spinner-layer spinner-white-only">
+                                <div class="circle-clipper left">
+                                    <div class="circle"></div>
+                                </div>
+                                <div class="gap-patch">
+                                    <div class="circle"></div>
+                                </div>
+                                <div class="circle-clipper right">
+                                    <div class="circle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span style="margin-left: 10px;">处理中...</span>
+                    `);
+                },
+                success: function (data) {
+                    M.toast({ html: '充值成功' });
+                    $('#recharge-modal').modal('close');
+                    loadBalanceData(); // 刷新余额和记录
+
+                    // 重置表单
+                    $('input[name="recharge-amount"][value="100"]').prop('checked', true);
+                    $('#custom-amount-container').hide();
+                    $('#custom-amount').val('');
+                    $('#confirm-recharge').removeClass('disabled').text('确认充值');
+                },
+                fail: function (message) {
+                    M.toast({ html: '充值失败: ' + message });
+                    $('#confirm-recharge').removeClass('disabled').text('确认充值');
+                }
+            });
+        });
+
+    });
+</script>

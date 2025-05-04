@@ -1,0 +1,60 @@
+<style>
+    /* 商品卡片样式 */
+    .card.hoverable {
+        transition: all 0.3s ease;
+    }
+
+    .card.hoverable:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-image .badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-weight: bold;
+        padding: 0 8px;
+    }
+
+    .card .card-image {
+        height: 200px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 卡片操作按钮 */
+    .card-action a {
+        margin-right: 10px !important;
+    }
+
+    /* 空状态样式 */
+    .empty-state {
+        padding: 40px 0;
+        text-align: center;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 20px;
+    }
+
+    /* 分页样式 */
+    .pagination li.active.teal {
+        background-color: #009688;
+    }
+
+    /* 响应式调整 */
+    @media only screen and (max-width: 600px) {
+        .card-image img {
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .card-title {
+            font-size: 1.2rem !important;
+        }
+    }
+</style>

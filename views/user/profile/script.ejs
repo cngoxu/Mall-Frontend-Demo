@@ -1,0 +1,109 @@
+<script>
+    $(document).ready(function () {
+        $('select').formSelect();
+        $('#profile-form').find('input, select, textarea').prop('disabled', true);
+
+        function loadData(data) {
+            $('#profile-username').text(data.username);
+            $('#profile-email').text(data.email);
+            $('#profile-avatar').attr('src', data.avatar);
+
+            $('#profile-name').val(data.username);
+            $('#profile-gender').val(data.gender);
+            $('#profile-age').val(data.age);
+            $('#profile-phone').val(data.phone);
+            $('#profile-avatar-url').val(data.avatar);
+            $('#profile-register-time').val(formatDate(new Date(data.createdAt)));
+        }
+
+        
+        
+        // 加载用户信息
+        function loadUserProfile() {
+            customAjax({
+                path: `/user/profile`,
+                method: 'GET',
+                success: function (data) {
+                    loadData(data);
+                    $('select').formSelect();
+                },
+                fail: function (message) {
+                    M.toast({ html: "加载用户信息失败: " + message});
+                }
+            });
+        }
+
+        loadUserProfile();
+
+        // 测试图片
+        $('#avatar-test').click(function () {
+            $('#profile-avatar-test').attr('src', $('#profile-avatar-url').val());
+        });
+
+        // 存储原始值
+        let originalFormData = {};
+        function switchToEditMode() {
+            const $this = $('#profile-edit');
+            const $inputs = $('#profile-form').find('input, select, textarea');
+            const $submitBtn = $('#profile-form #submit-btn');
+            $inputs.prop('disabled', false);
+            $submitBtn.prop('disabled', false);
+            $this.html('放弃修改 <i class="material-icons right">cancel</i>');
+            $this.removeClass('orange').addClass('red');
+        }
+        function switchToViewMode() {
+            const $this = $('#profile-edit');
+            const $inputs = $('#profile-form').find('input, select, textarea');
+            const $submitBtn = $('#profile-form #submit-btn');
+            $inputs.prop('disabled', true);
+            $submitBtn.prop('disabled', true);
+            $this.html('修改信息 <i class="material-icons right">edit</i>');
+            $this.removeClass('red').addClass('orange');
+        }
+        $('#profile-edit').click(function () {
+            const $this = $(this);
+            const $inputs = $('#profile-form').find('input, select, textarea');
+            if ($this.text().startsWith('修改信息')) {
+                $inputs.each(function () {
+                    originalFormData[this.id] = $(this).val();
+                });
+                // 切换到编辑模式
+                switchToEditMode();
+            } else {
+                // 放弃修改，恢复原状
+                $inputs.each(function () {
+                    $(this).val(originalFormData[this.id]);
+                });
+                switchToViewMode();
+            }
+        });
+
+
+        // 保存个人信息
+        $('#profile-form').submit(function (e) {
+            e.preventDefault();
+
+            const formData = {
+                username: $('#profile-name').val(),
+                gender: $('#profile-gender').val(),
+                age: $('#profile-age').val(),
+                phone: $('#profile-phone').val(),
+                avatar: $('#profile-avatar-url').val()
+            };
+
+            customAjax({
+                path: `/user/profile`,
+                method: 'PUT',
+                data: formData,
+                success: function (data) {
+                    M.toast({ html: '个人信息更新成功' });
+                    switchToViewMode();
+                    loadData(data);
+                },
+                fail: function (message) {
+                    M.toast({ html: '个人信息更新失败: ' + message });
+                }
+            });
+        });
+    });
+</script>

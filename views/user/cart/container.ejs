@@ -1,0 +1,55 @@
+<div class="container">
+    <!-- 标题和操作按钮 -->
+    <div class="section">
+        <div class="row valign-wrapper">
+            <div class="col s6">
+                <h3>我的购物车</h3>
+            </div>
+            <div class="col s6 right-align">
+                <a href="#" id="select-all" class="btn-flat waves-effect">全选</a>
+            </div>
+        </div>
+        <div class="divider"></div>
+    </div>
+
+    <!-- 购物车列表 -->
+    <div class="section" id="cart-container">
+        <div id="cart-items">
+            <!-- 加载动画 -->
+            <div class="center-align" style="padding: 40px 0;">
+                <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-teal-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>正在加载购物车...</p>
+            </div>
+        </div>
+
+        <!-- 结算信息 -->
+        <div class="card-panel teal lighten-4" id="checkout-info">
+            <div class="row valign-wrapper">
+                <div class="col s6">
+                    <h5>已选 <span id="selected-count">0</span> 件商品</h5>
+                    <p>合计: <span class="red-text" id="total-price">¥0.00</span></p>
+                </div>
+                <div class="col s6 right-align">
+                    <a href="#" id="remove-selected" class="btn waves-effect waves-light red">
+                        <i class="material-icons left">delete</i>删除选中
+                    </a>
+                    <a href="#" id="create-order" class="btn waves-effect waves-light teal">
+                        <i class="material-icons left">shopping_cart</i>结算
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

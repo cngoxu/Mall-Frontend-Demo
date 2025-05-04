@@ -1,0 +1,24 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 初始化Materialize组件
+        M.AutoInit();
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 链接点击统计
+        document.querySelectorAll('a[target="_blank"]').forEach(link => {
+            link.addEventListener('click', function () {
+                // 这里可以添加统计代码
+                console.log('外部链接点击:', this.href);
+            });
+        });
+    });
+</script>

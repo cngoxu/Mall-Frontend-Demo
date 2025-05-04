@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <%- include('../common/header', {
+        title: '验证码'
+    }) %>
+</head>
+<body>
+    <%- include('../common/navbar') %>
+    <div class="container main-content" style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+        <div style='background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+            <h1 style='color: #333;'>验证码</h1>
+            <p style='font-size: 18px; color: #666;'>尊敬的用户，您正在尝试进行身份验证。</p>
+            <p style='font-size: 24px; color: #333; font-weight: bold;'>验证码：
+                <span id ='verification-code' style='color: #ff6600;'> XXXXXX </span>
+            </p>
+            <p style='font-size: 14px; color: #999;'>请注意，此验证码仅用于身份验证，切勿泄露给他人。验证码将在10分钟内有效。</p>
+            <p style='font-size: 14px; color: #999;'>邮件创建时间：
+                <span id ='create-time' style='color: #ff6600;'>  </span>
+            </p>
+        </div>
+    </div>
+    <%- include('../common/footer') %>
+</body>
+
+<%- include('../common/script') %>
+<script>
+    customAjax({
+        path: "/user/get-verification-code",
+        method: "GET",
+        success: function(data){
+            $('#verification-code').text(data.verificationCode);
+            $('#create-time').text(data.createTime);
+        },
+        fail: function(message){
+            M.toast({html: "获取验证码失败：" + message});
+        }
+    })
+</script>

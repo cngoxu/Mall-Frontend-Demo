@@ -1,0 +1,76 @@
+<div class="container">
+    <div class="row">
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">注册</span>
+                    <form id="register-form">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="reg-email" type="email" class="validate" required>
+                                <label for="reg-email">邮箱</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="reg-code" type="text" class="validate" required>
+                                <label for="reg-code">验证码</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <button id="send-code" class="btn waves-effect waves-light"
+                                    type="button">发送验证码</button>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="reg-password" type="password" class="validate" required>
+                                <label for="reg-password">密码</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="reg-confirm-password" type="password" class="validate" required>
+                                <label for="reg-confirm-password">确认密码</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="username" type="text" class="validate" required>
+                                <label for="username">用户名</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="phone" type="tel" class="validate" required>
+                                <label for="phone">电话</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <select id="gender">
+                                    <option value="" disabled selected>选择性别</option>
+                                    <option value="male">男</option>
+                                    <option value="female">女</option>
+                                    <option value="other">其他</option>
+                                </select>
+                                <label>性别</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input id="age" type="number" class="validate" min="1" max="120">
+                                <label for="age">年龄</label>
+                            </div>
+                            <div class="col s4">
+                                <button class="btn waves-effect waves-light" id="avatar-test" type="button">测试图片
+                                    <i class="material-icons right">replay</i>
+                                </button>
+                            </div>
+                            <div class="col s8">
+                                <img id="profile-avatar-test" src="/images/avatar.svg"
+                                    class="circle responsive-img" style="width: 100px; height: 100px;">
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="avatar" type="text" class="validate" required>
+                                <label for="avatar">avatarUrl（输入可用的图片链接，本站不提供上传图片文件服务）</label>
+                            </div>
+                            <div class="col s12">
+                                <button class="btn waves-effect waves-light" type="submit">注册
+                                    <i class="material-icons right">send</i>
+                                </button>
+                                <a href="/login" class="right" style="margin-top: 15px; display: inline-block; margin-left: 10px;">已有账号?去登录</a>
+                                <a id="verification-code-tip" href="/email" target="_blank" class="right" style="margin-top: 15px; display: none; color: red;">收不到验证码？</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

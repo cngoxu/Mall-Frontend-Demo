@@ -1,0 +1,251 @@
+<script>
+    // 获取产品ID
+    const match = window.location.pathname.match(/\/product\/([^\/]+)\/detail/);
+    const productId = match ? match[1] : null;
+
+    $(document).ready(function () {
+        // 初始化Materialize组件
+        M.Modal.init(document.querySelectorAll('.modal'));
+        M.Materialbox.init(document.querySelectorAll('.materialboxed'));
+        M.Tabs.init(document.querySelectorAll('.tabs'));
+
+        // 加载产品数据
+        function loadProductData() {
+            customAjax({
+                path: `/product/view?productId=${productId}`,
+                method: 'GET',
+                before: function () {
+                    $('#skeleton-screen').show();
+                    $('#product-content').hide();
+                },
+                success: function (data) {
+                    renderProduct(data);
+                    generateFakeReviews();
+                    $('#skeleton-screen').hide();
+                    $('#product-content').fadeIn(300);
+                },
+                fail: function (response) {
+                    $('#skeleton-screen').html(`
+                        <div class="center-align" style="padding: 50px;">
+                            <i class="large material-icons red-text">error_outline</i>
+                            <h5>加载商品信息失败</h5>
+                            <p>${message || '请刷新页面重试'}</p>
+                            <a href="/" class="btn waves-effect waves-light">返回首页</a>
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        // 渲染产品信息
+        function renderProduct(product) {
+            // 基本信息
+            $('#product-name').text(product.title);
+            $('#product-main-image').attr('src', product.images || '/images/placeholder.png');
+
+            // 价格显示
+            if (product.discountPrice && product.discountPrice < product.price) {
+                $('#product-price').text(`¥${product.discountPrice.toFixed(2)}`);
+                $('#product-original-price').text(`¥${product.price.toFixed(2)}`).show();
+            } else {
+                $('#product-price').text(`¥${product.price.toFixed(2)}`);
+                $('#product-original-price').hide();
+            }
+
+            // 销量和库存状态
+            $('#product-sales').text(`销量: ${product.sales || 0}`);
+            updateStockStatus(product.stock);
+            
+            // 更新时间
+            const updateTime = product.updatedAt ? new Date(product.updatedAt).toLocaleString() : '未知';
+            $('#product-update-time').text(`更新时间: ${updateTime}`);
+
+            // 商品状态
+            const statusBadge = $('#product-status-badge');
+            if (product.status === 'inactive') {
+                statusBadge.text('已下架').addClass('grey').removeClass('red');
+            } else if (product.stock <= 0) {
+                statusBadge.text('售罄').addClass('red');
+            } else if (product.discountPrice) {
+                statusBadge.text('促销中').addClass('orange');
+            } else {
+                statusBadge.text('热卖中').addClass('red');
+            }
+
+            // 促销信息
+            const promotionBanner = $('#product-promotion');
+            promotionBanner.empty();
+            if (product.promotions && product.promotions.length > 0) {
+                product.promotions.forEach(promo => {
+                    promotionBanner.append(`<span class="promotion-tag">${promo}</span>`);
+                });
+            }
+
+            // 商品描述
+            $('#product-description').html(product.description || '暂无详细描述');
+
+            // 计算总价
+            updateTotalPrice();
+        }
+
+        // 更新库存状态显示
+        function updateStockStatus(stock) {
+            let statusText = '';
+            let statusClass = '';
+            
+            if (stock <= 0) {
+                statusText = '已售罄';
+                statusClass = 'red-text';
+                $('#quantity-decrease, #quantity-increase').addClass('disabled');
+            } else if (stock < 10) {
+                statusText = '即将售罄';
+                statusClass = 'orange-text';
+            } else {
+                statusText = '库存充足';
+                statusClass = 'green-text';
+            }
+            
+            $('#product-stock-status').html(`库存状态: <span class="${statusClass}">${statusText}</span> (剩余${stock}件)`);
+        }
+
+        // 生成虚假评价
+        function generateFakeReviews() {
+            const reviews = [
+                { user: '用户12345', rating: 5, date: '2023-05-15', comment: '商品质量很好，与描述一致，发货速度快，会再次购买！' },
+                { user: '购物达人', rating: 4, date: '2023-05-10', comment: '包装很严实，物流也快，就是尺寸比想象中小一点' },
+                { user: '匿名用户', rating: 5, date: '2023-05-08', comment: '非常满意的一次购物体验，客服态度也很好' },
+                { user: '老顾客', rating: 3, date: '2023-05-05', comment: '商品还可以，就是快递有点慢，等了三天才到' },
+                { user: '新用户', rating: 5, date: '2023-05-01', comment: '第一次在这家店买东西，比实体店便宜很多，质量也不错' }
+            ];
+            
+            const reviewsContainer = $('#reviews-container');
+            reviewsContainer.empty();
+            
+            reviews.forEach(review => {
+                let stars = '';
+                for (let i = 0; i < 5; i++) {
+                    stars += `<i class="material-icons tiny ${i < review.rating ? 'yellow-text' : 'grey-text'}">star</i>`;
+                }
+                
+                reviewsContainer.append(`
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="review-user">${review.user}</span>
+                            <div class="review-rating">${stars}</div>
+                            <span class="review-date">${review.date}</span>
+                        </div>
+                        <div class="review-content">${review.comment}</div>
+                    </div>
+                `);
+            });
+            
+            $('#review-count').text(reviews.length);
+        }
+
+        // 更新总价
+        function updateTotalPrice() {
+            const quantity = parseInt($('#product-quantity').val()) || 1;
+            const priceText = $('#product-price').text();
+            const price = parseFloat(priceText.replace('¥', ''));
+            const total = (price * quantity).toFixed(2);
+            $('#total-price').text(`¥${total}`);
+        }
+
+        // 数量增减按钮
+        $('#quantity-decrease').click(function (e) {
+            e.preventDefault();
+            const input = $('#product-quantity');
+            let value = parseInt(input.val()) || 1;
+            if (value > 1) {
+                input.val(value - 1);
+                updateTotalPrice();
+            }
+        });
+
+        $('#quantity-increase').click(function (e) {
+            e.preventDefault();
+            const input = $('#product-quantity');
+            let value = parseInt(input.val()) || 1;
+            input.val(value + 1);
+            updateTotalPrice();
+        });
+
+        // 数量输入框变化
+        $('#product-quantity').change(function() {
+            updateTotalPrice();
+        });
+
+        // 立即购买按钮
+        $('#buy-now-btn').click(function (e) {
+            e.preventDefault();
+            const quantity = parseInt($('#product-quantity').val()) || 1;
+
+            // 显示支付模态框
+            const modal = M.Modal.getInstance($('#payment-modal'));
+            $('#payment-product-name').text($('#product-name').text());
+            $('#payment-unit-price').text($('#product-price').text());
+            $('#payment-quantity').text(quantity);
+
+            // 计算总价
+            const priceText = $('#product-price').text();
+            const price = parseFloat(priceText.replace('¥', ''));
+            $('#payment-total-price').text(`¥${(price * quantity).toFixed(2)}`);
+
+            modal.open();
+        });
+
+        // 立即下单按钮
+        $('#confirm-create-order').click(function (e) {
+            e.preventDefault();
+            const quantity = parseInt($('#product-quantity').val()) || 1;
+
+            customAjax({
+                path: '/order/create',
+                method: 'POST',
+                data: {
+                    productId: productId,
+                    quantity: quantity,
+                },
+                before: function() {
+                    $('#confirm-create-order').addClass('disabled').html('处理中...');
+                },
+                success: function (data) {
+                    window.location.href = '/orders/';
+                },
+                fail: function (message) {
+                    M.toast({ html: '创建订单失败: ' + message });
+                    $('#confirm-create-order').removeClass('disabled').html('确认支付');
+                }
+            })
+        });
+
+        // 加入购物车按钮
+        $('#add-to-cart-btn').click(function (e) {
+            e.preventDefault();
+            const quantity = parseInt($('#product-quantity').val()) || 1;
+            
+            customAjax({
+                path: '/cart/add',
+                method: 'POST',
+                data: {
+                    productId: productId,
+                    quantity: quantity
+                },
+                before: function() {
+                    $('#add-to-cart-btn').addClass('disabled').html('<i class="material-icons left">add_shopping_cart</i>处理中...');
+                },
+                success: function (data) {
+                    M.toast({ html: '商品已成功加入购物车' });
+                    $('#add-to-cart-btn').removeClass('disabled').html('<i class="material-icons left">add_shopping_cart</i>加入购物车');
+                },
+                fail: function (message) {
+                    M.toast({ html: '加入购物车失败: ' + message });
+                    $('#add-to-cart-btn').removeClass('disabled').html('<i class="material-icons left">add_shopping_cart</i>加入购物车');
+                }
+            });
+        });
+
+        // 初始化加载数据
+        loadProductData();
+    });
+</script>

@@ -1,0 +1,47 @@
+<div class="container main-content">
+    <%- include('./carousel')  %>
+
+    <!-- 商品列表 -->
+    <div class="section">
+        <div class="row valign-wrapper">
+            <div class="col s6">
+                <h5>热门商品</h5>
+            </div>
+            <div class="col s6 right-align">
+                <span id="product-count">共加载 <span id="loaded-count">0</span>/<span id="total-count">0</span> 件商品</span>
+            </div>
+        </div>
+        
+        <!-- 排序选项 -->
+        <div class="sort-options">
+            <div class="chip active" data-sort="newest">最新上架</div>
+            <div class="chip" data-sort="price">按价格</div>
+            <div class="chip" data-sort="sales">按销量</div>
+        </div>
+        
+        <!-- 商品列表容器 -->
+        <!-- <div class="row" id="product-list">
+            <div class="col s12 center-align">
+                <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-blue-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div><div class="gap-patch">
+                            <div class="circle"></div>
+                        </div><div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <div class="row" id="product-list">
+            <!-- 商品卡片将通过JS动态生成 -->
+        </div>
+        
+        <!-- 加载更多按钮 -->
+        <div class="center">
+            <a id="load-more" class="waves-effect waves-light btn">加载更多</a>
+        </div>
+    </div>
+</div>

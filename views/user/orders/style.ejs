@@ -1,0 +1,71 @@
+<style>
+    /* 订单卡片样式 */
+    .card.hoverable {
+        transition: all 0.3s ease;
+    }
+
+    .card.hoverable:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 状态徽章 */
+    .badge[data-badge-caption]::after {
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    /* 按钮间距 */
+    .card-action .btn {
+        margin-left: 10px;
+    }
+
+    /* 分页样式 */
+    .pagination li.active.teal {
+        background-color: #009688;
+    }
+
+    /* 响应式调整 */
+    @media only screen and (max-width: 600px) {
+        .card-action .btn {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .valign-wrapper {
+            display: block;
+        }
+    }
+
+    /* 状态流程指示 */
+    /* 状态徽章 */
+    .status-badge {
+        padding: 2px 8px;
+        border-radius: 10px;
+        color: black;
+        font-weight: bold;
+    }
+
+    .status-flow {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+    }
+    
+    .status-step {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        position: relative;
+    }
+    
+    .status-step:not(:last-child):after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -15px;
+        width: 30px;
+        height: 2px;
+        background: #ddd;
+    }
+</style>

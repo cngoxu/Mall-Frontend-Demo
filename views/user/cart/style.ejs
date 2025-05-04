@@ -1,0 +1,65 @@
+<style>
+    /* 购物车商品卡片样式 */
+    .card.hoverable {
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+
+    .card.hoverable:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 数量选择器样式 */
+    .quantity-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background-color: #f5f5f5;
+        border-radius: 50%;
+        vertical-align: middle;
+        padding: 0;
+    }
+
+    .quantity-btn i {
+        font-size: 16px;
+    }
+
+    .quantity-input {
+        width: 40px;
+        text-align: center;
+        margin: 0 5px;
+        height: 24px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    /* 删除按钮 */
+    .remove-item-btn {
+        margin-left: 10px;
+    }
+
+    /* 结算信息面板 */
+    #checkout-info {
+        position: sticky;
+        bottom: 20px;
+        z-index: 1;
+    }
+
+    /* 响应式调整 */
+    @media only screen and (max-width: 600px) {
+        .quantity-input {
+            width: 30px;
+        }
+
+        .card-content .row .col {
+            padding: 0 5px;
+        }
+
+        .card-content .row .col.s3.m3 {
+            padding-right: 0;
+        }
+    }
+</style>

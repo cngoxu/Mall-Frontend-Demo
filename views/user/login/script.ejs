@@ -1,0 +1,25 @@
+<script>
+    $(document).ready(function () {
+        $('#login-form').submit(function (e) {
+            e.preventDefault();
+
+            const email = $('#email').val();
+            const password = $('#password').val();
+            
+            customAjax({
+                path: '/user/login',
+                method: 'POST',
+                data: { email, password },
+                success: function (data) {
+                    localStorage.setItem('userAvatar', data.avatar);
+                    localStorage.setItem('isLoggedIn', true);
+                    M.toast({ html: '登录成功' });
+                    window.location.href = '/';
+                },
+                fail: function (message) {
+                    M.toast({ html: '登录失败: ' + message });
+                }
+            });
+        });
+    });
+</script>

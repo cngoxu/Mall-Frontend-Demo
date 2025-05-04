@@ -1,0 +1,91 @@
+<div class="container">
+    <div class="row">
+        <div class="col s12 m4">
+            <div class="card">
+                <div class="card-content center">
+                    <img id="profile-avatar" src="/images/avatar.svg" class="circle responsive-img"
+                        style="width: 250px; height: auto; border-style: solid; border-width: 10px; border-color: grey;">
+                    <h5 id="profile-username">加载中...</h5>
+                    <p id="profile-email">加载中...</p>
+                    <!-- <div class="file-field input-field">
+                    <div class="btn orange">
+                        <span>更换头像</span>
+                        <input type="file" id="avatar-upload" accept="image/*">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div> -->
+                    <div class="row" style="margin-top: 25px">
+                        <div>
+                            <a href="/my-products" class="btn-flat waves-effect" style="display: inline-block;">我的商品</a>
+                            <a href="/orders" class="btn-flat waves-effect" style="display: inline-block;">我的订单</a>
+                        </div>
+                        <div>
+                            <a href="/balance" class="btn-flat waves-effect" style="display: inline-block;">我的钱包</a>
+                            <a href="/cart" class="btn-flat waves-effect" style="display: inline-block;">购物小车</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m8">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">个人信息</span>
+                    <form id="profile-form">
+                        <div class="row">
+                            <div class="input-field col s12 m6">
+                                <input disabled value="0" id="profile-name" type="text" class="validate">
+                                <label for="profile-name">昵称</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <select id="profile-gender">
+                                    <option value="male">男</option>
+                                    <option value="female">女</option>
+                                    <option value="other">其他</option>
+                                </select>
+                                <label>性别</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input disabled value="0" id="profile-age" type="number" class="validate" min="1"
+                                    max="120">
+                                <label for="profile-age">年龄</label>
+                            </div>
+                            <div class="input-field col s12 m6">
+                                <input disabled value="0" id="profile-phone" type="tel" class="validate">
+                                <label for="profile-phone">电话</label>
+                            </div>
+                            <div class="col s4">
+                                <button class="btn waves-effect waves-light" id="avatar-test" type="button">Test
+                                    new avatar
+                                    <i class="material-icons right">replay</i>
+                                </button>
+                            </div>
+                            <div class="col s8">
+                                <img id="profile-avatar-test" src="/images/avatar.svg" class="circle responsive-img"
+                                    style="width: 100px; height: 100px;">
+                            </div>
+                            <div class="input-field col s12">
+                                <input disabled value="0" id="profile-avatar-url" type="text" class="validate">
+                                <label for="profile-avatar-url">avatarUrl（输入可用的图片链接，本站不提供上传图片文件服务）</label>
+                            </div>
+                            <div class="col s12">
+                                <button class="btn waves-effect waves-light orange" id="profile-edit" type="button">修改信息
+                                    <i class="material-icons right">edit</i>
+                                </button>
+                                <button class="btn waves-effect waves-light" id="submit-btn" type="submit" disabled>保存修改
+                                    <i class="material-icons right">save</i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="input-field col s12">
+                        <input disabled value="0" id="profile-register-time" type="text" class="validate">
+                        <label for="profile-register-time">注册时间</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

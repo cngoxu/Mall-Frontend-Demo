@@ -1,0 +1,59 @@
+<div class="container">
+    <!-- 标题和余额展示 -->
+    <div class="section">
+        <div class="row valign-wrapper">
+            <div class="col s6">
+                <h3>我的钱包</h3>
+            </div>
+            <!-- 充值提现按钮 -->
+            <div class="col s6 right-align">
+                <a href="#recharge-modal" class="btn waves-effect waves-light teal modal-trigger">
+                    <i class="material-icons left">attach_money</i>充值
+                </a>
+                <a href="#withdraw-modal" class="btn waves-effect waves-light red modal-trigger"
+                    style="margin-left: 10px;">
+                    <i class="material-icons left">money_off</i>提现
+                </a>
+            </div>
+        </div>
+        <div class="divider"></div>
+
+        <!-- 余额卡片 -->
+        <div class="card-panel teal lighten-2 white-text">
+            <div class="row valign-wrapper">
+                <div class="col s6">
+                    <h5>当前余额</h5>
+                </div>
+                <div class="col s6 right-align">
+                    <h3 id="current-balance">¥0.00</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 余额流水 -->
+    <div class="section">
+        <h5>余额明细</h5>
+        <div class="divider"></div>
+
+        <div id="balance-records">
+            <!-- 加载动画 -->
+            <div class="center-align" style="padding: 40px 0;">
+                <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-teal-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>正在加载余额记录...</p>
+            </div>
+        </div>
+    </div>
+</div>

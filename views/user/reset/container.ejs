@@ -1,0 +1,48 @@
+<div class="container">
+    <div class="row">
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">找回密码</span>
+                    <form id="reset-password-form">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="reset-email" type="email" class="validate" required>
+                                <label for="reset-email">注册邮箱</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <div class="row" style="margin-bottom: 0;">
+                                    <div class="col s8">
+                                        <input id="verification-code" type="text" class="validate" required>
+                                        <label for="verification-code">验证码</label>
+                                    </div>
+                                    <div class="col s4">
+                                        <button id="send-code-btn" type="button" class="btn waves-effect waves-light" style="width: 100%; margin-top: 10px;">
+                                            获取验证码
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="new-password" type="password" class="validate" required minlength="6">
+                                <label for="new-password">新密码</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="confirm-password" type="password" class="validate" required minlength="6">
+                                <label for="confirm-password">确认新密码</label>
+                            </div>
+                            <div class="col s12">
+                                <button class="btn waves-effect waves-light" type="submit">重置密码
+                                    <i class="material-icons right">lock_reset</i>
+                                </button>
+                                
+                                <a href="/login" class="right" style="margin-top: 15px; display: inline-block; margin-left: 10px;">返回登录</a>
+                                <a id="verification-code-tip" href="/email" target="_blank" class="right" style="margin-top: 15px; display: none; color: red;">收不到验证码？</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

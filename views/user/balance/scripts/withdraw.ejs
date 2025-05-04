@@ -1,0 +1,79 @@
+<script>
+    $(document).ready(function() {
+        // 初始化提现模态框
+        const withdrawModal = M.Modal.init($('#withdraw-modal'));
+        const withdrawMethodSelect = M.FormSelect.init($('#withdraw-method'));
+
+        // 提现方式变更事件
+        $('#withdraw-method').change(function () {
+            const method = $(this).val();
+            if (method === 'bank') {
+                $('#bank-card-field').show();
+                $('#alipay-account-field').hide();
+            } else {
+                $('#bank-card-field').hide();
+                $('#alipay-account-field').show();
+            }
+        });
+
+        // 确认提现
+        $('#confirm-withdraw').click(function () {
+            const amount = parseFloat($('#withdraw-amount').val());
+            const method = $('#withdraw-method').val();
+            const account = method === 'bank' ? $('#bank-card-number').val() : $('#alipay-account').val();
+
+            if (!amount || amount <= 0) {
+                M.toast({ html: '请输入有效的提现金额' });
+                return;
+            }
+
+            if (!account) {
+                M.toast({ html: '请输入提现账号' });
+                return;
+            }
+
+            customAjax({
+                path: `/balance/withdraw`,
+                method: 'POST',
+                data: {
+                    amount: amount,
+                    method: method,
+                    account: account
+                },
+                before: function () {
+                    $('#confirm-withdraw').addClass('disabled').html(`
+                        <div class="preloader-wrapper small active">
+                            <div class="spinner-layer spinner-white-only">
+                                <div class="circle-clipper left">
+                                    <div class="circle"></div>
+                                </div>
+                                <div class="gap-patch">
+                                    <div class="circle"></div>
+                                </div>
+                                <div class="circle-clipper right">
+                                    <div class="circle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span style="margin-left: 10px;">处理中...</span>
+                    `);
+                },
+                success: function (data) {
+                    M.toast({ html: '提现申请已提交，请等待处理' });
+                    $('#withdraw-modal').modal('close');
+                    loadBalanceData(); // 刷新余额和记录
+
+                    // 重置表单
+                    $('#withdraw-amount').val('');
+                    $('#bank-card-number').val('');
+                    $('#alipay-account').val('');
+                    $('#confirm-withdraw').removeClass('disabled').text('确认提现');
+                },
+                fail: function (message) {
+                    M.toast({ html: '提现失败: ' + message });
+                    $('#confirm-withdraw').removeClass('disabled').text('确认提现');
+                }
+            });
+        });
+    });
+</script>

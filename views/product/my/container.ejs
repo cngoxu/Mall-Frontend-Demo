@@ -1,0 +1,44 @@
+<div class="container">
+    <!-- 标题和新增按钮 -->
+    <div class="section">
+        <div class="row valign-wrapper">
+            <div class="col s6">
+                <h3>我的商品</h3>
+            </div>
+            <div class="col s6 right-align">
+                <a href="/products/new" class="btn waves-effect waves-light teal">
+                    <i class="material-icons left">add</i>发布新商品
+                </a>
+            </div>
+        </div>
+        <div class="divider"></div>
+    </div>
+
+    <!-- 商品列表容器 -->
+    <div class="section" id="products-container">
+        <div class="row" id="products-list">
+            <!-- 商品将通过AJAX动态加载 -->
+            <div class="col s12 center-align" style="padding: 40px 0;">
+                <div class="preloader-wrapper big active">
+                    <div class="spinner-layer spinner-teal-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="gap-patch">
+                            <div class="circle"></div>
+                        </div>
+                        <div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>正在加载商品...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分页容器 -->
+    <div class="section center-align" id="pagination-container">
+        <!-- 分页将通过AJAX动态加载 -->
+    </div>
+</div>

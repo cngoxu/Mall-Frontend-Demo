@@ -1,0 +1,158 @@
+<script>
+    // 渲染余额流水记录
+    function renderBalanceRecords(records, append = false) {
+        // 没有余额变动记录,append表示追加记录，不清空原有记录
+        if (!records || records.length === 0) {
+            if (!append) {
+                $('#balance-records').html(`
+                    <div class="center-align" style="padding: 40px 0;">
+                        <i class="material-icons large grey-text">receipt</i>
+                        <h5>暂无记录</h5>
+                        <p>您还没有任何余额变动记录</p>
+                    </div>
+                `);
+            }
+            return;
+        }
+
+        let html = '';
+        if (!append) {
+            html = '<ul class="collection">';
+        }
+
+        // 处理每一条记录
+        records.forEach(record => {
+            const amountClass = record.amount >= 0 ? 'teal-text' : 'red-text';
+            const amountSign = record.amount >= 0 ? '+' : '-';
+            const typeText = getRecordTypeText(record.type);
+
+            html += `
+<li class="collection-item avatar">
+    <i class="material-icons circle ${getColorByType(record.type)}">
+        ${record.amount >= 0 ? 'arrow_upward' : 'arrow_downward'}
+    </i>
+    <span class="title">${typeText}</span>
+    <p>
+        ${new Date(record.createdAt).toLocaleString()}<br>
+        流水号: ${record.serialNo || 'N/A'}<br>
+        订单号: ${record.orderId || 'N/A'}
+    </p>
+    <span class="secondary-content">
+        <span class="${amountClass}">${amountSign}¥${Math.abs(record.amount).toFixed(2)}</span><br>
+        <small>余额: ¥${record.balanceAfter.toFixed(2)}</small>
+    </span>
+</li>
+                `;
+        });
+
+        if (!append) {
+            html += '</ul>';
+
+            // 添加加载更多按钮
+            html += `
+<div class="center-align" style="margin: 20px 0;">
+    <a id="load-more-records" class="waves-effect waves-light btn teal">
+        <i class="material-icons left">expand_more</i>加载更多
+    </a>
+</div>
+        `;
+            $('#balance-records').html(html);
+        } else {
+            $('#balance-records ul.collection').append(html);
+        }
+    }
+
+    // 分页变量
+    let currentPage = 1;
+    const recordsPerPage = 10;
+
+    function loadBalanceData(page = 1, append = false) {
+        // 加载余额
+        customAjax({
+            path: `/balance`,
+            method: 'GET',
+            success: function (data) {
+                $('#current-balance').text(`¥${data.balance.toFixed(2)}`);
+                // 提现模态框中的可用余额
+                $('#available-balance').text(`¥${data.balance.toFixed(2)}`);
+            },
+            fail: function (message) {
+                M.toast({ html: '获取余额失败: ' + message });
+            }
+        });
+
+        // 加载流水记录
+        customAjax({
+            path: `/balance/log`,
+            method: 'GET',
+            data: {
+                page: page,
+                limit: recordsPerPage
+            },
+            success: function (data) {
+                renderBalanceRecords(data, append);
+                currentPage = page;
+
+                // 如果没有更多记录，隐藏加载更多按钮
+                if (!data || data.length < recordsPerPage) {
+                    $('#load-more-records').hide();
+                }
+            },
+            fail: function (message) {
+                if (!append) {
+                    $('#balance-records').html(`
+                        <div class="center-align" style="padding: 40px 0;">
+                            <i class="material-icons large grey-text">error_outline</i>
+                            <h5>无法加载余额记录</h5>
+                            <p>${message}</p>
+                            <a href="javascript:location.reload()" class="btn waves-effect waves-light teal">重新加载</a>
+                        </div>
+                    `);
+                }
+            }
+        });
+        
+        
+
+        
+    }
+
+    // 获取记录类型文本
+    function getRecordTypeText(type) {
+        switch (type) {
+            case 'recharge': return '账户充值';
+            case 'consume': return '订单支付';
+            case 'refund': return '订单退款';
+            case 'withdraw': return '余额提现';
+            case 'system': return '系统调整';
+            default: return '其他交易';
+        }
+    }
+
+    function getColorByType(type) {
+        switch (type) {
+            case 'recharge': // 账户充值
+                return 'teal'; // 使用 teal 颜色
+            case 'consume': // 订单支付
+                return 'red'; // 使用 red 颜色
+            case 'refund': // 订单退款
+                return 'green'; // 使用 green 颜色
+            case 'withdraw': // 余额提现
+                return 'orange'; // 使用 orange 颜色
+            case 'system': // 系统调整
+                return 'blue'; // 使用 blue 颜色
+            default: // 其他交易
+                return 'grey'; // 使用 grey 颜色
+        }
+    }
+
+    $(document).ready(function () {
+        // 初始加载数据
+        loadBalanceData();
+
+        // 加载更多记录
+        $(document).on('click', '#load-more-records', function () {
+            loadBalanceData(currentPage + 1, true);
+        });
+    });
+</script>

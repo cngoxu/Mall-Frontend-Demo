@@ -1,0 +1,104 @@
+<script>
+    $(document).ready(function () {
+        // 初始化Materialize组件
+        M.updateTextFields();
+        M.textareaAutoResize($('#product-description'));
+
+        // 图片URL加载
+        $('#load-image-url').click(function () {
+            const imageUrl = $('#image-url').val();
+
+            if (!imageUrl) {
+                M.toast({ html: '请输入图片URL' });
+                return;
+            }
+
+            if (!/^https?:\/\/.+\..+/.test(imageUrl)) {
+                M.toast({ html: '请输入有效的图片URL' });
+                return;
+            }
+
+            $('#main-image-preview').html(`
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-teal-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div><div class="gap-patch">
+                            <div class="circle"></div>
+                        </div><div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>正在加载图片...</p>
+            `);
+
+            const testImage = new Image();
+            testImage.onload = function () {
+                $('#main-image-preview').html(`
+                    <img src="${imageUrl}" class="responsive-img" style="max-height: 200px;">
+                `);
+            };
+
+            testImage.onerror = function () {
+                $('#main-image-preview').html('<p class="red-text">图片加载失败，请检查URL</p>');
+            };
+
+            testImage.src = imageUrl;
+        });
+
+        // 表单提交
+        $('#product-form').submit(function (e) {
+            e.preventDefault();
+            
+            // 验证表单
+            if (!$('#product-name').val() || !$('#product-price').val() || 
+                !$('#product-stock').val() || !$('#product-description').val() || 
+                !$('#image-url').val()) {
+                M.toast({ html: '请填写所有必填字段' });
+                return;
+            }
+
+            const formData = {
+                title: $('#product-name').val(),
+                price: $('#product-price').val(),
+                stock: $('#product-stock').val(),
+                desc: $('#product-description').val(),
+                images: $('#image-url').val(),
+                status: $('input[name="status"]').is(':checked') ? 'active' : 'inactive'
+            };
+
+            customAjax({
+                path: `/product/create`,
+                method: 'POST',
+                data: formData,
+                before: function () {
+                    $('#publish-btn').addClass('disabled').html(`
+                        <div class="preloader-wrapper small active">
+                            <div class="spinner-layer spinner-white-only">
+                                <div class="circle-clipper left">
+                                    <div class="circle"></div>
+                                </div><div class="gap-patch">
+                                    <div class="circle"></div>
+                                </div><div class="circle-clipper right">
+                                    <div class="circle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span style="margin-left: 10px;">发布中...</span>
+                    `);
+                },
+                success: function (data) {
+                    M.toast({ html: '商品发布成功' });
+                    setTimeout(() => {
+                        window.location.href = '/my-products';
+                    }, 1000);
+                },
+                fail: function (message) {
+                    M.toast({ html: '发布失败: ' + message });
+                    $('#publish-btn').removeClass('disabled').html('发布商品');
+                }
+            });
+        });
+    });
+</script>

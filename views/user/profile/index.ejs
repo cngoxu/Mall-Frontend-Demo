@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <%- include('../../common/header', { title: '个人中心' }) %>
+</head>
+
+<body>
+    <%- include('../../common/navbar') %>
+    <%- include('./container') %>
+    <%- include('../../common/footer') %>
+</body>
+
+<%- include('../../common/script') %>
+<%- include('./script') %>
+</html>
+
+<style>
+    /* 商品卡片样式 */
+.card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+</style>

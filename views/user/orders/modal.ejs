@@ -1,0 +1,100 @@
+<!-- 支付模态框 -->
+<div id="payment-modal" class="modal">
+    <div class="modal-content">
+        <h4>订单支付</h4>
+        <div class="divider"></div>
+        <div class="row">
+            <div class="col s12">
+                <h5>订单号: <span id="payment-order-id"></span></h5>
+                <p>总金额: <span class="red-text" id="payment-total-amount"></span></p>
+                <div class="divider"></div>
+                <h5>选择支付方式</h5>
+                <ul class="collection">
+                    <li class="collection-item">
+                        <label>
+                            <input name="payment-method" type="radio" value="alipay" checked />
+                            <span><i class="material-icons left">payment</i>支付宝</span>
+                        </label>
+                    </li>
+                    <li class="collection-item">
+                        <label>
+                            <input name="payment-method" type="radio" value="wechat" />
+                            <span><i class="material-icons left">payment</i>微信支付</span>
+                        </label>
+                    </li>
+                    <li class="collection-item">
+                        <label>
+                            <input name="payment-method" type="radio" value="bank" />
+                            <span><i class="material-icons left">account_balance</i>银行卡支付</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">稍后支付</a>
+        <a href="#!" id="confirm-payment" class="modal-close waves-effect waves-light btn teal">立即支付</a>
+    </div>
+</div>
+
+<!-- 取消订单模态框 -->
+<div id="cancel-confirm-modal" class="modal">
+    <div class="modal-content">
+        <h4>取消订单</h4>
+        <p>订单号 <strong class="modal-order-id"></strong></p>
+        <p>您确定要取消订单吗？取消订单后将无法恢复，请谨慎操作。</p>
+        <div class="input-field">
+            <textarea id="cancel-reason" class="materialize-textarea"></textarea>
+            <label for="cancel-reason">取消原因</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">放弃</a>
+        <a href="#!" id="confirm-cancel" class="modal-close waves-effect waves-light btn red">确认取消订单</a>
+    </div>
+</div>
+
+<!-- 退款确认模态框 -->
+<div id="refund-confirm-modal" class="modal">
+    <div class="modal-content">
+        <h4>确认退款</h4>
+        <p>订单号 <strong class="modal-order-id"></strong></p>
+        <p>您确定要申请退款吗？退款申请提交后我们将尽快处理。</p>
+        <div class="input-field">
+            <textarea id="refund-reason" class="materialize-textarea"></textarea>
+            <label for="refund-reason">退款原因</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">取消</a>
+        <a href="#!" id="confirm-refund" class="modal-close waves-effect waves-light btn red">提交退款申请</a>
+    </div>
+</div>
+
+<!-- 状态修改模态框 -->
+<div id="status-modal" class="modal">
+    <div class="modal-content">
+        <h4>确认订单状态变更</h4>
+        <div class="divider"></div>
+        <div class="row">
+            <!-- <p>当前状态: <span id="current-status"></span></p> -->
+            <div class="col s12">
+                <p>确定要将订单 <strong class="modal-order-id"></strong> 的状态从 <span id="current-status" class="status-badge"></span> 更改为下一个状态吗？</p>
+                
+                <h5>订单状态流程</h5>
+                <div class="status-flow">
+                    <div class="status-step pending">待付款</div>
+                    <div class="status-step paid">已付款</div>
+                    <div class="status-step shipped">已发货</div>
+                    <div class="status-step received">已收货</div>
+                    <div class="status-step completed">已完成</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">取消</a>
+        <a href="#!" id="confirm-status-change" class="modal-close waves-effect waves-light btn teal">确认修改</a>
+    </div>
+</div>

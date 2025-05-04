@@ -1,0 +1,402 @@
+<script>
+    $(document).ready(function () {
+        // 初始化组件
+        const paymentModal = M.Modal.init($('#payment-modal'));
+        const refundModal = M.Modal.init($('#refund-confirm-modal'));
+        const statusModal = M.Modal.init($('#status-modal'));
+        const cancelModal = M.Modal.init($('#cancel-confirm-modal'));
+        M.FormSelect.init($('#new-status'));
+        M.textareaAutoResize($('#refund-reason'));
+
+        // 全局变量
+        let allOrders = [];
+        let currentPage = 1;
+        const itemsPerPage = 8;
+        let currentOrderId = null;
+
+        // 加载所有订单
+        function loadAllOrders() {
+            customAjax({
+                path: '/order',
+                method: 'GET',
+                success: function (data) {
+                    allOrders = data || [];
+                    renderPage(1);
+                },
+                fail: function (message) {
+                    $('#orders-list').html(`
+                        <div class="col s12 center-align" style="padding: 40px 0;">
+                            <i class="material-icons large grey-text">error_outline</i>
+                            <h5>加载失败</h5>
+                            <p>${message || '无法加载订单数据'}</p>
+                            <a href="javascript:location.reload()" class="btn waves-effect waves-light teal">重新加载</a>
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        // 渲染指定页面的订单
+        function renderPage(page) {
+            currentPage = page;
+            const totalItems = allOrders.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            // 计算当前页的订单
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            const pageOrders = allOrders.slice(startIndex, endIndex);
+
+            // 渲染订单列表
+            renderOrders(pageOrders);
+
+            // 渲染分页
+            renderPagination(totalItems, page, totalPages);
+        }
+
+        // 渲染订单列表
+        function renderOrders(orders) {
+            if (!orders || orders.length === 0) {
+                $('#orders-list').html(`
+                    <div class="col s12 center-align" style="padding: 40px 0;">
+                        <i class="material-icons large grey-text">inbox</i>
+                        <h5>暂无订单</h5>
+                        <p>您还没有任何订单记录</p>
+                    </div>
+                `);
+                return;
+            }
+
+            let html = '';
+            orders.forEach(order => {
+                const statusClass = getStatusClass(order.status);
+                const statusText = getStatusText(order.status);
+                const canNotEdit = order.status === 'completed' || order.status === 'cancelled' || order.status === 'refunded';
+
+                html += renderNewOrderItem(order, statusClass, statusText, canNotEdit);
+            });
+
+            $('#orders-list').html(html);
+            bindOrderEvents();
+        }
+
+        // 渲染分页
+        function renderPagination(totalItems, currentPage, totalPages) {
+            if (totalPages <= 1) {
+                $('#pagination-container').empty();
+                return;
+            }
+
+            let html = '<ul class="pagination">';
+
+            // 上一页按钮
+            if (currentPage > 1) {
+                html += `
+                    <li class="waves-effect">
+                        <a href="#" data-page="${currentPage - 1}">
+                        <i class="material-icons">chevron_left</i>
+                        </a>
+                    </li>
+                `;
+            } else {
+                html += `
+                    <li class="disabled">
+                        <a href="#!">
+                        <i class="material-icons">chevron_left</i>
+                        </a>
+                    </li>
+                `;
+            }
+
+            // 页码
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <li class="${currentPage === i ? 'active teal' : 'waves-effect'}">
+                        <a href="#" data-page="${i}">${i}</a>
+                    </li>
+                `;
+            }
+
+            // 下一页按钮
+            if (currentPage < totalPages) {
+                html += `
+                    <li class="waves-effect">
+                        <a href="#" data-page="${currentPage + 1}">
+                        <i class="material-icons">chevron_right</i>
+                        </a>
+                    </li>
+                `;
+            } else {
+                html += `
+                <li class="disabled">
+                    <a href="#!">
+                    <i class="material-icons">chevron_right</i>
+                    </a>
+                </li>
+                `;
+            }
+
+            html += '</ul>';
+            $('#pagination-container').html(html);
+            bindPaginationEvents();
+        }
+
+        // 绑定订单操作事件
+        function bindOrderEvents() {
+            // 支付按钮
+            $('.pay-btn').click(function (e) {
+                e.preventDefault();
+                const card = $(this).closest('.card');
+                currentOrderId = card.data('order-id');
+                const order = allOrders.find(o => o.orderId === currentOrderId);
+
+                if (order) {
+                    $('#payment-order-id').text(order.orderId);
+                    $('#payment-total-amount').text(`¥${order.totalPrice.toFixed(2)}`);
+                    $('#payment-modal').modal('open');
+                }
+            });
+
+            $('.cancel-btn').click(function (e) {
+                e.preventDefault();
+                const card = $(this).closest('.card');
+                currentOrderId = card.data('order-id');
+                const order = allOrders.find(o => o.orderId === currentOrderId);
+
+                if (order) {
+                    $('.modal-order-id').text(currentOrderId);
+                    $('#cancel-confirm-modal').modal('open');
+                }
+            });
+
+            // 退款按钮
+            $('.refund-btn').click(function (e) {
+                e.preventDefault();
+                const card = $(this).closest('.card');
+                currentOrderId = card.data('order-id');
+                const order = allOrders.find(o => o.orderId === currentOrderId);
+
+                if (order) {
+                    $('.modal-order-id').text(currentOrderId);
+                    $('#refund-confirm-modal').modal('open');
+                }
+                
+            });
+
+            // 修改状态按钮
+            $('.change-status-btn').click(function (e) {
+                e.preventDefault();
+                const card = $(this).closest('.card');
+                currentOrderId = card.data('order-id');
+                const order = allOrders.find(o => o.orderId === currentOrderId);
+
+                if (order) {
+                    $('.modal-order-id').text(currentOrderId);
+                    $('#current-status').text(getStatusText(order.status));
+                    $('#new-status').val('');
+                    M.FormSelect.init($('#new-status'));
+                    $('#status-modal').modal('open');
+                }
+            });
+        }
+
+        // 绑定分页事件
+        function bindPaginationEvents() {
+            $('.pagination a[data-page]').click(function (e) {
+                e.preventDefault();
+                const page = $(this).data('page');
+                if (!$(this).parent().hasClass('disabled') && !$(this).parent().hasClass('active')) {
+                    renderPage(page);
+                }
+            });
+        }
+
+        // 确认支付
+        $('#confirm-payment').click(function () {
+            if (!currentOrderId) return;
+            const paymentMethod = $('input[name="payment-method"]:checked').val();
+
+            customAjax({
+                path: `/order/pay`,
+                method: 'PUT',
+                data: { orderId: currentOrderId },
+                success: function () {
+                    M.toast({ html: '支付成功' });
+                    // 更新本地数据并重新渲染当前页
+                    const order = allOrders.find(o => o.orderId === currentOrderId);
+                    if (order) {
+                        order.status = 'paid';
+                    }
+                    renderPage(currentPage);
+                },
+                fail: function (message) {
+                    M.toast({ html: '支付失败: ' + message });
+                }
+            });
+        });
+
+        // 确认退款
+        $('#confirm-refund').click(function () {
+            if (!currentOrderId) return;
+            const reason = $('#refund-reason').val();
+
+            customAjax({
+                path: `/order/refund`,
+                method: 'PUT',
+                data: { orderId: currentOrderId },
+                success: function () {
+                    M.toast({ html: '退款申请已提交' });
+                    // 更新本地数据并重新渲染当前页
+                    const order = allOrders.find(o => o.orderId === currentOrderId);
+                    if (order) {
+                        order.status = 'refunded';
+                    }
+                    renderPage(currentPage);
+                    $('#refund-reason').val(''); 
+                },
+                fail: function (message) {
+                    M.toast({ html: '提交退款失败: ' + message });
+                }
+            });
+        });
+
+        // 确认取消订单
+        $('#confirm-cancel').click(function () {
+            if (!currentOrderId) return;
+            const reason = $('#cancel-reason').val();
+
+            customAjax({
+                path: `/order/cancel`,
+                method: 'PUT',
+                data: { orderId: currentOrderId },
+                success: function () {
+                    M.toast({ html: '订单取消成功' });
+                    // 更新本地数据并重新渲染当前页
+                    const order = allOrders.find(o =>  o.orderId === currentOrderId);
+                    if (order) {
+                        order.status = 'cancelled';
+                    }
+                    renderPage(currentPage);
+                    $('#cancel-reason').val(''); 
+                },
+                fail: function (message) {
+                    M.toast({ html: '订单取消失败: ' + message });
+                }
+            });
+        });
+
+        // 确认状态修改
+        $('#confirm-status-change').click(function () {
+            if (!currentOrderId) return;
+            customAjax({
+                path: '/order/update',
+                method: 'PUT',
+                data: { orderId: currentOrderId },
+                success: function (data) {
+                    M.toast({ html: '状态更新成功' });
+                    // 更新本地数据并重新渲染当前页
+                    const order = allOrders.find(o => o.orderId === currentOrderId);
+                    if (order) {
+                        order.status = data.status;
+                    }
+                    renderPage(currentPage);
+                    $('#status-modal').modal('close');
+                },
+                fail: function (message) {
+                    M.toast({ html: '状态更新失败: ' + message });
+                }
+            });
+        });
+
+        // 辅助函数：获取状态对应的CSS类
+        function getStatusClass(status) {
+            switch (status) {
+                case 'pending': return 'orange';
+                case 'paid': return 'blue';
+                case 'shipped': return 'purple';
+                case 'received': return 'green';
+                case 'completed': return 'teal';
+                case 'cancelled': return 'red';
+                case 'refunded': return 'grey';
+                default: return 'grey';
+            }
+        }
+
+        // 辅助函数：获取状态对应的文本
+        function getStatusText(status) {
+            switch (status) {
+                case 'pending': return '待付款';
+                case 'paid': return '已付款';
+                case 'shipped': return '已发货';
+                case 'received': return '已签收';
+                case 'completed': return '已完成';
+                case 'cancelled': return '已取消';
+                case 'refunded': return '已退款';
+                default: return '未知状态';
+            }
+        }
+
+        // 初始加载所有订单
+        loadAllOrders();
+    });
+</script>
+
+<script>
+    function renderNewOrderItem(order, statusClass, statusText, canNotEdit) {
+        return`
+<div class="col s12">
+    <div class="card hoverable" data-order-id="${order.orderId}">
+    <div class="card-content">
+        <div class="row valign-wrapper" style="margin-bottom: 0;">
+        <div class="col s8">
+            <span class="card-title">订单号: ${order.orderId}</span>
+            <p>创建时间: ${new Date(order.createdAt).toLocaleString()}</p>
+        </div>
+        <div class="col s4 right-align">
+            <span class="new badge ${statusClass}" data-badge-caption="${statusText}"></span>
+            <h5 class="teal-text">¥${order.totalPrice.toFixed(2)}</h5>
+        </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="row" style="margin-bottom: 0;">
+        <div class="col s12 m8">
+            <p><a href="/product/${order.productId}/detail" target="_self">商品链接</a></p>
+            <p>商品单价: ${order.originalPrice.toFixed(2)}</p>
+            <p>购买数量: ${order.quantity}</p>
+        </div>
+        <div class="col s12 m4 right-align">
+            <a href="/order/${order.orderId}" class="btn waves-effect waves-light teal lighten-2">
+            <i class="material-icons left">visibility</i>查看详情
+            </a>
+        </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="row" style="margin-bottom: 0;">
+        <div class="col s12 right-align">
+            ${order.status === 'pending' ? `
+            <a href="#!" class="btn waves-effect waves-light teal pay-btn">
+                <i class="material-icons left">payment</i>立即支付
+            </a>
+            <a href="#!" class="btn waves-effect waves-light red cancel-btn">
+                <i class="material-icons left">cancel</i>取消订单
+            </a>
+            ` : `
+            <a href="#!" class="btn waves-effect waves-light blue change-status-btn" ${canNotEdit ? 'disabled' : ''}>
+                <i class="material-icons left">edit</i>修改状态
+            </a>
+            <a href="#!" class="btn waves-effect waves-light red refund-btn" ${canNotEdit ? 'disabled' : ''}>
+                <i class="material-icons left">money_off</i> 申请退款
+            </a>
+            ` }
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+          `;
+        }
+</script>

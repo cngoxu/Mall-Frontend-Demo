@@ -1,0 +1,110 @@
+<nav class="nav-extended">
+    <div class="nav-wrapper">
+        <a href="/" class="brand-logo"><i class="material-icons">cloud</i>Demo Mall</a>
+        <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="/about">关于</a></li>
+            <!-- 我的下拉菜单 -->
+            <li>
+                <a class="dropdown-trigger" href="#" data-target="my-dropdown">我的<i
+                        class="material-icons right">arrow_drop_down</i></a>
+                <ul id="my-dropdown" class="dropdown-content">
+                    <li><a href="/profile">个人中心</a></li>
+                    <li><a href="/my-products">我的商品</a></li>
+                    <li><a href="/orders">我的订单</a></li>
+                    <li><a href="/balance">我的钱包</a></li>
+                    <li><a href="/cart">购物小车</a></li>
+                </ul>
+            </li>
+            <!-- 用户头像下拉菜单 -->
+            <li>
+                <a class="dropdown-trigger" href="#" data-target="user-dropdown">
+                    <img id="user-avatar" src="/images/avatar.svg" class="circle avatar-img" alt="用户头像">
+                </a>
+                <ul id="user-dropdown" class="dropdown-content">
+                    <li><a href="/login">用户登录</a></li>
+                    <li><a href="/register">用户注册</a></li>
+                    <li><a href="/reset-password">找回密码</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<ul class="sidenav" id="mobile-nav">
+    <li><a href="/about">关于</a></li>
+    
+    <!-- 第一个二级菜单 -->
+    <li class="no-padding">
+        <ul class="collapsible collapsible-accordion">
+            <li>
+                <a class="collapsible-header waves-effect">
+                    我的
+                    <i class="material-icons right">arrow_drop_down</i>
+                </a>
+                <div class="collapsible-body">
+                    <ul>
+                        <li><a href="/profile" class="waves-effect">个人中心</a></li>
+                        <li><a href="/my-products" class="waves-effect">我的商品</a></li>
+                        <li><a href="/orders" class="waves-effect">我的订单</a></li>
+                        <li><a href="/balance" class="waves-effect">我的钱包</a></li>
+                        <li><a href="/cart" class="waves-effect">购物小车</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </li>
+    
+    <!-- 第二个二级菜单 -->
+    <li class="no-padding">
+        <ul class="collapsible collapsible-accordion">
+            <li>
+                <a class="collapsible-header waves-effect">
+                    账户
+                    <i class="material-icons right">arrow_drop_down</i>
+                </a>
+                <div class="collapsible-body">
+                    <ul id="mobile-user-dropdown">
+                        <li><a href="/login" class="waves-effect">用户登录</a></li>
+                        <li><a href="/register" class="waves-effect">用户注册</a></li>
+                        <li><a href="/reset-password" class="waves-effect">找回密码</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<style>
+    .avatar-img {
+        width: 40px;
+        height: 40px;
+        margin-top: 10px;
+    }
+
+    nav {
+        padding: 0 20px;
+    }
+
+    /* 二级菜单样式调整 */
+    #mobile-nav .collapsible-header {
+        padding: 0 32px;
+        line-height: 48px;
+        height: 48px;
+    }
+
+    #mobile-nav .collapsible-body {
+        padding: 0;
+    }
+
+    #mobile-nav .collapsible-body ul a {
+        padding-left: 48px;
+    }
+
+    /* 图标对齐调整 */
+    #mobile-nav .collapsible-header i {
+        line-height: 48px;
+        margin-right: 0;
+    }
+</style>
+

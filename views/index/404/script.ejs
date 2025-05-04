@@ -1,0 +1,12 @@
+<script>
+    $(document).ready(function() {
+        // 初始化所有Materialize组件
+        M.AutoInit();
+        
+        // 添加波浪效果
+        $('.waves-effect').each(function() {
+            Waves.attach(this, ['waves-light']);
+        });
+        Waves.init();
+    });
+</script>

@@ -1,0 +1,134 @@
+<script>
+    // 后端API地址
+    const apiUrl = window.location.protocol + '//' + window.location.hostname + ':8088';
+
+    // 通用的格式化日期函数
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = ('0' + (date.getMonth() + 1)).slice(-2);
+        const day = ('0' + date.getDate()).slice(-2);
+        const hours = ('0' + date.getHours()).slice(-2);
+        const minutes = ('0' + date.getMinutes()).slice(-2);
+        const seconds = ('0' + date.getSeconds()).slice(-2);
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+</script>
+<!-- 引入第三方库 -->
+<script src="/js/jquery-3.6.0.min.js"></script>
+<script src="/js/jquery.validate.min.js"></script>
+<script src="/js/messages_zh.min.js"></script>
+<script src="/materialize/js/materialize.min.js"></script>
+
+<script>
+    // 封装成自定义的aja请求函数
+    function customAjax(options = {}) {
+        $.ajax({
+            url: `${apiUrl}${options.path}`,
+            type: options.method,
+            xhrFields: {
+                withCredentials: true  // 发送 cookies/认证信息
+            },
+            data: options.data,
+            beforeSend: function(){
+                if(options.before){
+                    options.before();
+                }
+            },
+            success: function (response) {
+                if(response.status === "success"){
+                    options.success(response.data);
+                } else {
+                    // 用户未登录
+                    if(response.code === 20003){
+                        // 本地执行登出
+                        localLogout();
+                        // 未登录，跳转到登录页面
+                        setTimeout(() => {
+                            window.location.href = '/login';
+                        }, 2000);
+                    }
+                    options.fail(response.message || '未知错误，请重试');
+                }
+            },
+            error: function (xhr, status, error) {
+                if (xhr.status === 0) {
+                    // 服务器断开连接
+                    options.fail('无法连接到服务器，请检查网络或稍后再试');
+                } else {
+                    options.fail(xhr.responseJSON?.message || '未知错误，请重试');
+                }
+            },
+            complete: function(){
+                if(options.complete){
+                    options.complete();
+                }
+            }
+        });
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        // 移动端的侧边栏初始化
+        $('.sidenav').sidenav();
+        // 初始化移动端的侧边栏可折叠菜单
+        $('.collapsible').collapsible({
+            accordion: false // 设置为false可以同时展开多个菜单
+        });
+        // 初始化导航栏下拉菜单
+        $('.dropdown-trigger').dropdown({
+            coverTrigger: false,
+            constrainWidth: false
+        });
+
+        // 检查localStorage中shi是否登录状态
+        if (localStorage.getItem('isLoggedIn') === 'true' && 
+            localStorage.getItem('userAvatar')) {
+            $('#user-avatar').attr('src', localStorage.getItem('userAvatar'));
+
+            const menu = `
+                <li><a href="/profile">个人中心</a></li>
+                <li class="divider"></li>
+                <li><a href="/modify-password">修改密码</a></li>
+                <li><a href="#" class="logout-link">退出登陆</a></li>
+            `;
+            // 更新下拉菜单为登录状态
+            $('#user-dropdown').html(menu);
+            $('#mobile-user-dropdown').html(menu);
+
+            // 绑定logout函数
+            $('.logout-link').click(function (e) {
+                e.preventDefault(); // 阻止默认跳转行为
+                logout();
+            });
+        }
+    });
+    
+    // 本地执行登出函数
+    function localLogout() {
+        // 清除localStorage和cookie，本地执行登出
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userAvatar');
+        document.cookie = `token=${new Date().getTime()}${Math.random()}; Path=/; Max-Age=3600`;
+    };
+
+    // 用户登出函数
+    function logout() {
+        // 本地执行登出
+        localLogout();
+        // 发送登出请求
+        customAjax({
+            path: '/user/logout',
+            method: 'POST',
+            data: null,
+            before: null,
+            success: function (data) {
+                M.toast({ html: "登出成功"});
+                window.location.href = '/'; // 登出成功后跳转到首页
+            },
+            fail: function (message) {
+                M.toast({ html: "本地已经执行登出，但是远程登出失败" + message });
+            }
+        });
+    }
+</script>

@@ -1,0 +1,131 @@
+<script>
+    $(document).ready(function () {
+        // 初始化表单验证
+        $('#reset-password-form').validate({
+            rules: {
+                'verification-code': {
+                    required: true,
+                    minlength: 6
+                },
+                'new-password': {
+                    required: true,
+                    minlength: 6
+                },
+                'confirm-password': {
+                    required: true,
+                    minlength: 6,
+                    equalTo: '#new-password'
+                }
+            },
+            messages: {
+                'confirm-password': {
+                    equalTo: '两次输入的密码不一致'
+                }
+            },
+            errorElement: 'div',
+            errorClass: 'invalid-feedback',
+            errorPlacement: function (error, element) {
+                error.insertAfter(element);
+            },
+            submitHandler: function (form) {
+                resetPassword();
+                return false;
+            }
+        });
+
+        // 发送验证码按钮点击事件
+        $('#send-code-btn').click(function () {
+            const email = $('#reset-email').val();
+
+            if (!email) {
+                M.toast({ html: '请输入邮箱地址', classes: 'red' });
+                return;
+            }
+
+            if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+                M.toast({ html: '请输入有效的邮箱地址', classes: 'red' });
+                return;
+            }
+
+            sendVerificationCode(email);
+        });
+
+        // 发送验证码函数
+        function sendVerificationCode(email) {
+            const $sendBtn = $('#send-code-btn');
+            $sendBtn.prop('disabled', true).html('发送中...');
+
+            customAjax({
+                path: '/user/send-verification-code',
+                method: 'POST',
+                data: { email },
+                before: function() {
+                    $('#send-code').addClass('disabled').text('发送中...');
+                },
+                success: function(data) {
+                    M.toast({ html: '验证码已发送至您的邮箱', classes: 'green'  });
+                    // 倒计时60秒
+                    startCountdown();
+                },
+                fail: function(message) {
+                    M.toast({ html: "验证码发送失败 : " + message});
+                    $sendBtn.prop('disabled', false).html('获取验证码');
+                }
+            });
+        }
+
+        // 倒计时函数
+        function startCountdown() {
+            let countdown = 60;
+            const $sendBtn = $('#send-code-btn');
+            $sendBtn.prop('disabled', true);
+
+            const timer = setInterval(function () {
+                $sendBtn.html(`重新发送(${countdown}s)`);
+                countdown--;
+
+                if (countdown < 0) {
+                    clearInterval(timer);
+                    $sendBtn.prop('disabled', false).html('获取验证码');
+                    $("#verification-code-tip").show();
+                }
+            }, 1000);
+        }
+
+        // 重置密码函数
+        function resetPassword() {
+            const email = $('#reset-email').val();
+            const code = $('#verification-code').val();
+            const newPassword = $('#new-password').val();
+            
+            if(newPassword !== $('#confirm-password').val()){
+                M.toast({ html: '两次输入的密码不一致', classes: 'red' });
+                return;
+            }
+
+            // 显示加载状态
+            const $submitBtn = $('#reset-password-form button[type="submit"]');
+            $submitBtn.prop('disabled', true).html('处理中...');
+
+            customAjax({
+                path: '/user/reset-password',
+                method: 'POST',
+                data: {
+                    email: email,
+                    verificationCode: code,
+                    newPassword: newPassword
+                },
+                success: function (data) {
+                    M.toast({ html: '密码重置成功！请使用新密码登录', classes: 'green' });
+                    setTimeout(function () {
+                        window.location.href = '/login';
+                    }, 2000);
+                },
+                error: function (xhr) {
+                    M.toast({ html: '密码重置失败 : ' + response.message , classes: 'red' });
+                    $submitBtn.prop('disabled', false).html('重置密码 <i class="material-icons right">lock_reset</i>');
+                }
+            });
+        }
+    });
+</script>

@@ -1,0 +1,39 @@
+<!-- 支付模态框 -->
+<div id="payment-modal" class="modal">
+    <div class="modal-content">
+        <h4>确认订单</h4>
+        <div class="divider"></div>
+        <div class="order-summary">
+            <p><strong>商品名称:</strong> <span id="payment-product-name"></span></p>
+            <p><strong>单价:</strong> <span id="payment-unit-price"></span></p>
+            <p><strong>数量:</strong> <span id="payment-quantity"></span></p>
+            <div class="divider"></div>
+            <h5>总计: <span id="payment-total-price" class="red-text"></span></h5>
+        </div>
+        <!-- <div class="payment-methods">
+            <h5>选择支付方式</h5>
+            <p>
+                <label>
+                    <input name="payment-method" type="radio" value="alipay" checked />
+                    <span>支付宝支付</span>
+                </label>
+            </p>
+            <p>
+                <label>
+                    <input name="payment-method" type="radio" value="wechat" />
+                    <span>微信支付</span>
+                </label>
+            </p>
+            <p>
+                <label>
+                    <input name="payment-method" type="radio" value="later" />
+                    <span>稍后支付</span>
+                </label>
+            </p>
+        </div> -->
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">取消</a>
+        <a href="#!" class="waves-effect waves-light btn red" id="confirm-create-order">立即下单</a>
+    </div>
+</div>

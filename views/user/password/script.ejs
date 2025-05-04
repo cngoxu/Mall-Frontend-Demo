@@ -1,0 +1,79 @@
+<script>
+    $(document).ready(function () {
+        // 初始化表单验证
+        $('#change-password-form').validate({
+            rules: {
+                'current-password': {
+                    required: true,
+                    minlength: 6
+                },
+                'new-password': {
+                    required: true,
+                    minlength: 6,
+                    notEqualTo: '#current-password'
+                },
+                'confirm-password': {
+                    required: true,
+                    minlength: 6,
+                    equalTo: '#new-password'
+                }
+            },
+            messages: {
+                'new-password': {
+                    notEqualTo: '新密码不能与当前密码相同'
+                },
+                'confirm-password': {
+                    equalTo: '两次输入的密码不一致'
+                }
+            },
+            errorElement: 'div',
+            errorClass: 'invalid-feedback',
+            errorPlacement: function (error, element) {
+                error.insertAfter(element);
+            },
+            submitHandler: function (form) {
+                changePassword();
+                return false;
+            }
+        });
+
+        // 添加自定义验证规则 - 新密码不能与当前密码相同
+        $.validator.addMethod("notEqualTo", function (value, element, param) {
+            return this.optional(element) || value !== $(param).val();
+        }, "新密码不能与当前密码相同");
+
+        // 修改密码函数
+        function changePassword() {
+            const currentPassword = $('#current-password').val();
+            const newPassword = $('#new-password').val();
+
+            const $submitBtn = $('#change-password-form button[type="submit"]');
+
+            customAjax({
+                path: '/user/password',
+                method: 'PUT',
+                data: {
+                    oldPassword: currentPassword,
+                    newPassword: newPassword
+                },
+                before: function() {
+                    // 显示加载状态
+                    $submitBtn.prop('disabled', true).html('处理中...');
+                },
+                success: function(data) {
+                    M.toast({ html: '密码修改成功！', classes: 'green' });
+                    // 清空表单
+                    $('#change-password-form')[0].reset();
+                    // 自动登出用户，要求重新登录
+                    setTimeout(() => { 
+                        logout(); 
+                    }, 1500);
+                },
+                fail: function(message) {
+                    M.toast({ html: '密码修改失败 : ' + message, classes: 'red' });
+                    $submitBtn.prop('disabled', false).html('确认修改 <i class="material-icons right">lock</i>');
+                }
+            });
+        }
+    });
+</script>

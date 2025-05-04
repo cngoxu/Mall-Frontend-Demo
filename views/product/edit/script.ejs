@@ -1,0 +1,228 @@
+<script>
+    // 从URL获取商品ID
+    const match = window.location.pathname.match(/\/product\/([^\/]+)\/edit/);
+    const productId = match ? match[1] : null;
+    
+    $(document).ready(function () {
+        // 初始化Materialize组件
+        M.updateTextFields();
+        M.textareaAutoResize($('#product-description'));
+        $('#product-id').val(productId);
+
+        // 存储原始商品数据
+        let originalProductData = null;
+
+        // 加载商品数据
+        function loadProductData() {
+            customAjax({
+                path: `/product/view?productId=${productId}`,
+                method: 'GET',
+                success: function (data) {
+                    originalProductData = data;
+                    populateForm(originalProductData);
+                },
+                fail: function (message) {
+                    M.toast({ html: '加载商品信息失败: ' + message });
+                }
+            });
+        }
+
+        // 填充表单数据
+        function populateForm(product) {
+            $('#product-name').val(product.title);
+            $('#product-price').val(product.price);
+            $('#current-stock').text(product.stock);    
+            $('#stock-change').val(product.stock);
+            $('#product-description').val(product.description);
+            $('input[name="status"]').prop('checked', product.status === 'active');
+            M.updateTextFields();
+
+            $('#product-sales').text(product.sales || 0);
+            $('#product-created').text(formatDate(new Date(product.createdAt)));
+            $('#stock-updated').text(formatDate(new Date(product.updatedAt)));
+            
+            // 处理主图
+            if (product.images) {
+                $('#main-image-preview').html(`
+                    <img src="${product.images}" class="responsive-img" style="max-height: 200px;">
+                `);
+                $('#main-image-url').val(product.images);
+                $('#image-url').val(product.images);
+            }
+        }
+
+        // 切换编辑模式
+        function toggleEditMode(editing) {
+            $('#product-name').prop('readonly', !editing);
+            $('#product-price').prop('readonly', !editing);
+            $('#product-description').prop('readonly', !editing);
+            $('input[name="status"]').prop('disabled', !editing);
+            $('#image-url').prop('disabled', !editing);
+            $('#load-image-url').toggleClass('disabled', !editing);
+            
+            // 库存控制
+            $('#stock-change').prop('disabled', !editing);
+            $('.stock-btn').toggleClass('disabled', !editing);
+            $('#update-stock-btn').toggleClass('disabled', !editing);
+            
+            // 按钮状态
+            $('#save-btn').toggleClass('disabled', !editing);
+            $('#edit-btn').text(editing ? '放弃' : '编辑');
+        }
+
+        // 库存增减按钮事件
+        $('.plus-btn').click(function() {
+            if ($(this).hasClass('disabled')) return;
+            const input = $('#stock-change');
+            let value = parseInt(input.val()) || 0;
+            input.val(value + 1);
+        });
+
+        $('.minus-btn').click(function() {
+            if ($(this).hasClass('disabled')) return;
+            const input = $('#stock-change');
+            let value = parseInt(input.val()) || 0;
+            if (value > 0) {
+                input.val(value - 1);
+            }
+        });
+
+        // 更新库存按钮
+        $('#update-stock-btn').click(function() {
+            const newStock = parseInt($('#stock-change').val());
+            const currentStock = parseInt($('#current-stock').text());
+            const change = newStock - currentStock;
+            
+            if (change === 0) {
+                M.toast({ html: '库存变更量为0，无需更新' });
+                return;
+            }
+
+            customAjax({
+                path: '/product/updateStock',
+                method: 'PUT',
+                data: {
+                    productId: productId,
+                    newStock: newStock
+                },
+                success: function (data) {
+                    M.toast({ html: `库存已${change > 0 ? '增加' : '减少'}${Math.abs(change)}，新库存: ${newStock}` });
+                    $('#current-stock').text(newStock);
+                },
+                fail: function (message) {
+                    M.toast({ html: '更新库存失败: ' + message });
+                }
+            });
+        });
+
+        // 图片URL加载
+        $('#load-image-url').click(function () {
+            if ($(this).hasClass('disabled')) return;
+            
+            const imageUrl = $('#image-url').val();
+
+            if (!imageUrl) {
+                M.toast({ html: '请输入图片URL' });
+                return;
+            }
+
+            if (!/^https?:\/\/.+\..+/.test(imageUrl)) {
+                M.toast({ html: '请输入有效的图片URL' });
+                return;
+            }
+
+            $('#main-image-preview').html(`
+                <div class="preloader-wrapper small active">
+                    <div class="spinner-layer spinner-teal-only">
+                        <div class="circle-clipper left">
+                            <div class="circle"></div>
+                        </div><div class="gap-patch">
+                            <div class="circle"></div>
+                        </div><div class="circle-clipper right">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+                <p>正在加载图片...</p>
+            `);
+
+            const testImage = new Image();
+            testImage.onload = function () {
+                $('#main-image-preview').html(`
+                    <img src="${imageUrl}" class="responsive-img" style="max-height: 200px;">
+                `);
+                $('#main-image-url').val(imageUrl);
+            };
+
+            testImage.onerror = function () {
+                $('#main-image-preview').html('<p class="red-text">图片加载失败，请检查URL</p>');
+                $('#main-image-url').val('');
+            };
+
+            testImage.src = imageUrl;
+        });
+
+        // 编辑/放弃按钮点击事件
+        $('#edit-btn').click(function () {
+            if ($(this).text().indexOf('编辑') >= 0) {
+                toggleEditMode(true);
+            } else {
+                if (confirm('确定要放弃所有更改吗？未保存的修改将丢失。')) {
+                    populateForm(originalProductData);
+                    toggleEditMode(false);
+                }
+            }
+        });
+
+        // 保存按钮点击事件
+        $('#save-btn').click(function () {
+            if ($(this).hasClass('disabled')) return;
+            
+            if (confirm('确定要保存商品信息的修改吗？(不包含商品库存)')) {
+                const formData = {
+                    productId: $('#product-id').val(),
+                    title: $('#product-name').val(),
+                    price: $('#product-price').val(),
+                    desc: $('#product-description').val(),
+                    images: $('#main-image-url').val(),
+                    status: $('input[name="status"]').is(':checked') ? 'active' : 'inactive'
+                };
+
+                customAjax({
+                    path: '/product/update',
+                    method: 'PUT',
+                    data: formData,
+                    before: function () {
+                        $('#save-btn').addClass('disabled').html(`
+                            <div class="preloader-wrapper small active">
+                                <div class="spinner-layer spinner-white-only">
+                                    <div class="circle-clipper left">
+                                        <div class="circle"></div>
+                                    </div><div class="gap-patch">
+                                        <div class="circle"></div>
+                                    </div><div class="circle-clipper right">
+                                        <div class="circle"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span style="margin-left: 10px;">保存中...</span>
+                        `);
+                    },
+                    success: function (data) {
+                        M.toast({ html: '商品信息保存成功' });
+                        loadProductData(); // 重新加载数据
+                        toggleEditMode(false);
+                        $('#save-btn').removeClass('disabled').html('保存');
+                    },
+                    fail: function (message) {
+                        M.toast({ html: '保存失败: ' + message });
+                        $('#save-btn').removeClass('disabled').html('保存');
+                    }
+                });
+            }
+        });
+
+        // 初始加载商品数据
+        loadProductData();
+    });
+</script>
