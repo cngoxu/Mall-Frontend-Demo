@@ -1,7 +1,7 @@
 <script>
     $(document).ready(function () {
         $('select').formSelect();
-        $('#profile-form').find('input, select, textarea').prop('disabled', true);
+        $('#profile-form').find('input', 'select').prop('disabled', true);
 
         function loadData(data) {
             $('#profile-username').text(data.username);
@@ -14,9 +14,7 @@
             $('#profile-phone').val(data.phone);
             $('#profile-avatar-url').val(data.avatar);
             $('#profile-register-time').val(formatDate(new Date(data.createdAt)));
-        }
-
-        
+        }     
         
         // 加载用户信息
         function loadUserProfile() {
