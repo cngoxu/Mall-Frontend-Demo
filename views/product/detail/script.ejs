@@ -24,7 +24,7 @@
                     $('#skeleton-screen').hide();
                     $('#product-content').fadeIn(300);
                 },
-                fail: function (response) {
+                fail: function (message) {
                     $('#skeleton-screen').html(`
                         <div class="center-align" style="padding: 50px;">
                             <i class="large material-icons red-text">error_outline</i>
@@ -210,6 +210,7 @@
                     $('#confirm-create-order').addClass('disabled').html('处理中...');
                 },
                 success: function (data) {
+                    $('#confirm-create-order').removeClass('disabled').html('确认支付');
                     window.location.href = '/orders/';
                 },
                 fail: function (message) {
