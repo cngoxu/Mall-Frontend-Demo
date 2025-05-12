@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+// 设置全局变量
+app.locals.apiUrl = process.env.API_URL || "";
+
 // 设置模板引擎
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
