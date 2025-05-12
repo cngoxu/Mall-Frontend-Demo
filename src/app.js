@@ -5,13 +5,15 @@ const app = express();
 // 设置全局变量
 app.locals.apiUrl = process.env.API_URL || "";
 
+console.log(__dirname)
+
 // 设置模板引擎
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // 静态文件
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/materialize', express.static(path.join(__dirname, 'node_modules/materialize-css/dist')));
+app.use('/materialize', express.static(path.join(__dirname, '../node_modules/materialize-css/dist')));
 
 // 路由
 app.get('/', (req, res) => {
