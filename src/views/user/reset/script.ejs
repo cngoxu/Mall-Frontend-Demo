@@ -121,8 +121,8 @@
                         window.location.href = '/login';
                     }, 2000);
                 },
-                error: function (xhr) {
-                    M.toast({ html: '密码重置失败 : ' + response.message , classes: 'red' });
+                fail: function (message) {
+                    M.toast({ html: "密码重置失败：" + message , classes: 'red' });
                     $submitBtn.prop('disabled', false).html('重置密码 <i class="material-icons right">lock_reset</i>');
                 }
             });
