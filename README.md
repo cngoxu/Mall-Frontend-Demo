@@ -1,6 +1,6 @@
 # Mall-Frontend-Demo (电商平台前端演示项目)
 
-![电商平台截图](public/images/screenshot.png)  
+![电商平台截图](src/public/images/screenshot.png)  
 一个基于Node.js的电商平台前端演示系统，包含完整的商品展示、购物车和订单管理功能。
 
 ## 目录
